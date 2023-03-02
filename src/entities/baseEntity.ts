@@ -1,3 +1,3 @@
-export abstract class BaseEntity{
-  id: number
+export abstract class BaseEntity {
+  id: number;
 }

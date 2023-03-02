@@ -7,6 +7,6 @@ import { AsteroidsService } from './asteroids.service';
 @Module({
   imports: [HttpModule],
   providers: [AsteroidProxy, AsteroidsService],
-  controllers: [AsteroidsController]
+  controllers: [AsteroidsController],
 })
 export class AsteroidsModule {}

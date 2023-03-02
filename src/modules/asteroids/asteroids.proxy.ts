@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Asteroid, CloseApproachData } from "@entities/asteroid.entity";
 import { HttpService } from "@nestjs/axios";
 import { catchError, firstValueFrom } from "rxjs";
@@ -16,7 +16,7 @@ export interface IAsteroidProxy {
 export class AsteroidProxy implements IAsteroidProxy  {
   private readonly URL_LIST = "https://api.nasa.gov/neo/rest/v1/feed"
   private readonly URL_DETAILS = "https://api.nasa.gov/neo/rest/v1/neo/"
-  private readonly API_KEY = "DEMO_KEY"
+  private readonly API_KEY = "k6YX6dO9ditrvI7Euo37AalYXifRItjAZWLsBQ1a"
 
   constructor(private readonly httpService: HttpService) { }
  
@@ -30,7 +30,10 @@ export class AsteroidProxy implements IAsteroidProxy  {
         }
       }).pipe(
         catchError((error: AxiosError) => {
-          throw 'An error happened calling the Asteroid List API!';
+          if(error.response.status == 404)
+            throw new NotFoundException(`Not found`)
+          else 
+            throw "An error occured calling external APIs"
         })
       )
     )
@@ -47,7 +50,10 @@ export class AsteroidProxy implements IAsteroidProxy  {
         }
       }).pipe(
         catchError((error: AxiosError) => {
-          throw 'An error happened calling the Asteroid Detail API!';
+          if(error.response.status == 404)
+            throw new NotFoundException(`Not found  with id: ${id}.`)
+          else 
+            throw "An error occured calling external APIs"
         })
       )
     )
@@ -82,9 +88,9 @@ export class AsteroidProxy implements IAsteroidProxy  {
       const item: CloseApproachData = {
         close_approach_date:	line.close_approach_date,
 	      relative_velocity: {
-          kilometers_per_second:	line.kilometers_per_second,
-          kilometers_per_hour:	line.kilometers_per_hour,
-          miles_per_hour:	line.miles_per_hour
+          kilometers_per_second:	line.relative_velocity.kilometers_per_second,
+          kilometers_per_hour:	line.relative_velocity.kilometers_per_hour,
+          miles_per_hour:	line.relative_velocity.miles_per_hour
         },
         miss_distance: {
           astronomical:	line.miss_distance.astronomical,
